@@ -1,0 +1,20 @@
+{
+  "logging": "DEBUG",
+
+  "alert_consumers": ["log", "email", "database"],
+  "timer_consumers": ["log"],
+
+  "brokers": "localhost:9092",
+  "consumer_group": "watchtower-alert",
+  "topic": "watchtower",
+
+  "consumers": {
+    "database": {
+      "drivername": "postgresql",
+      "host": "localhost",
+      "username": "watchtower",
+      "password": "",
+      "databasename": "watchtower"
+    }
+  }
+}

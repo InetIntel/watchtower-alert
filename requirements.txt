@@ -1,0 +1,7 @@
+confluent-kafka
+sqlalchemy
+psycopg2-binary
+requests
+pytimeseries
+slackclient
+aiohttp<4.0.0
