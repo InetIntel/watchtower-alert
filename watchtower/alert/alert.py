@@ -1,5 +1,6 @@
 import json
 import requests
+import sys
 
 # Shut requests up
 import warnings
@@ -9,8 +10,8 @@ logging.getLogger("requests").setLevel(logging.WARNING)
 
 class Alert:
 
-    CH_META_API = "https://charthouse.caida.org/data/meta/hierarchical/annotate"
     LEVELS = ['critical', 'warning', 'normal', 'error']
+    IODA_ENTITY_API = "http://api.ioda.inetintel.cc.gatech.edu/v2/entities"
 
     def __init__(self, fqid, name, level, time, expression, history_expression,
                  method, violations=None):
@@ -52,57 +53,44 @@ class Alert:
             return
         # collect all the expressions from violations that don't already have
         # a meta set
-        expressions = []
+        expressions = set()
         for v in self.violations:
-            if v.meta is None:
-                expressions.append(v.expression)
+            if v.meta is None and "/" in v.expression:
+                expressions.add(v.expression)
+
         if not len(expressions):
             # nothing to do...
             self.violations_annotated = True
             return
-        # do a batch lookup for efficiency
-        resp = requests.post(self.CH_META_API, {'expression[]': expressions})
-        try:
-            res = resp.json()
-        except Exception as e:
-            raise RuntimeError('Charthouse annotation failed with JSON decode error: %s' % e.msg)
-        if not res or 'data' not in res or not res['data']:
-            raise RuntimeError('Charthouse annotation failed with error: %s' %
-                               res['error'] if res else None)
-        # build a mapping from v.expression to metas
+
         metas = {}
-        for expression in expressions:
-            if expression not in res['data'] or res['data'][expression] is None \
-                    or 'annotations' not in res['data'][expression] \
-                    or res['data'][expression]['annotations'] is None:
+        for exp in expressions:
+            resp = requests.get(self.IODA_ENTITY_API + "/" + exp)
+            try:
+                res = resp.json()
+            except Exception as e:
+                logging.error('IODA entity annotation %s failed with JSON decode error: %s' % (exp, e.msg))
                 continue
-            for ann in res['data'][expression]['annotations']:
-                if ann['type'] != 'meta':
-                    continue
-                if ann['attributes']['type'] == 'geo':
-                    metas[expression] = self._parse_geo_ann(ann)
-                elif ann['attributes']['type'] == 'asn':
-                    metas[expression] = {
-                        'meta_type': 'asn',
-                        'fqid': ann['attributes']['fqid'],
-                        'meta_code': ann['attributes']['asn']
-                    }
+
+            if not res or 'data' not in res or not res['data']:
+                logging.error('IODA entity annotation %s failed with error: %s' %
+                               (exp, res['error'] if res else None))
+                continue
+
+            try:
+                metas[exp] = {
+                    "meta_type": res["data"][0]["type"],
+                    "fqid": res["data"][0]["attrs"]["fqid"],
+                    "meta_code": res["data"][0]["code"]
+                }
+            except Exception as e:
+                logging.error('Unable to parse IODA entity annotation %s: %s' % (exp, e))
+
         # now assign meta to each violation
         for v in self.violations:
             if v.expression in metas:
                 v.meta = metas[v.expression]
         self.violations_annotated = True
-
-    @staticmethod
-    def _parse_geo_ann(ann):
-        type = ann['attributes']['nativeLevel']
-        if type is None:
-            return None
-        return {
-            'meta_type': type,
-            'fqid': ann['attributes']['fqid'],
-            'meta_code': ann['attributes'][type]['id']
-        }
 
     @property
     def fqid(self):

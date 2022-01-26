@@ -45,9 +45,8 @@ class DatabaseConsumer(AbstractConsumer):
             sqlalchemy.Column('query_time', sqlalchemy.Integer, nullable=False),
             sqlalchemy.Column('level', sqlalchemy.String, nullable=False),
             sqlalchemy.Column('method', sqlalchemy.String, nullable=False),
-            sqlalchemy.Column('query_expression', sqlalchemy.Text, nullable=False),
-            sqlalchemy.Column('history_query_expression', sqlalchemy.Text,
-                              nullable=False),
+            sqlalchemy.Column('query_expression', sqlalchemy.Text),
+            sqlalchemy.Column('history_query_expression', sqlalchemy.Text),
 
             # Violation columns, some of which could be null when no data, back to normal, etc
             sqlalchemy.Column('time', sqlalchemy.Integer),
@@ -74,11 +73,11 @@ class DatabaseConsumer(AbstractConsumer):
             sqlalchemy.Column('fqid', sqlalchemy.String, nullable=False),
             sqlalchemy.Column('name', sqlalchemy.String, nullable=False),
             sqlalchemy.Column('query_time', sqlalchemy.Integer, nullable=False),
-            sqlalchemy.Column('query_expression', sqlalchemy.String, nullable=False),
-            sqlalchemy.Column('history_query_expression', sqlalchemy.String, nullable=False),
+            sqlalchemy.Column('query_expression', sqlalchemy.String),
+            sqlalchemy.Column('history_query_expression', sqlalchemy.String),
             sqlalchemy.Column('type', sqlalchemy.String, nullable=False),
             sqlalchemy.Column('message', sqlalchemy.String, nullable=False),
-            sqlalchemy.UniqueConstraint('fqid', 'query_time', 'query_expression', 'type',
+            sqlalchemy.UniqueConstraint('fqid', 'query_time', 'type',
                                         'message')
         )
 

@@ -51,7 +51,7 @@ class Consumer:
             'bootstrap.servers': self.config['brokers'],
             'group.id': self.config['consumer_group'],
             'default.topic.config': {'auto.offset.reset': 'latest'},
-            'heartbeat.interval.ms': 60000,
+            'heartbeat.interval.ms': 30000,
             'api.version.request': True,
         }
         self.kc = confluent_kafka.Consumer(**kafka_conf)
