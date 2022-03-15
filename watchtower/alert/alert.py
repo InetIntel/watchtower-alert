@@ -56,7 +56,11 @@ class Alert:
         expressions = set()
         for v in self.violations:
             if v.meta is None and "/" in v.expression:
-                expressions.add(v.expression)
+                vsplit = v.expression.split("/")
+                if len(vsplit) >= 2:
+                    enttype = vsplit[0]
+                    entcode = vsplit[1]
+                    expressions.add((enttype, entcode))
 
         if not len(expressions):
             # nothing to do...
@@ -65,7 +69,7 @@ class Alert:
 
         metas = {}
         for exp in expressions:
-            resp = requests.get(self.IODA_ENTITY_API + "/" + exp)
+            resp = requests.get(self.IODA_ENTITY_API + "?entityType=" + exp[0] + "&entityCode=" + exp[1])
             try:
                 res = resp.json()
             except Exception as e:
