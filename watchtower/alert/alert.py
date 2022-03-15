@@ -69,6 +69,7 @@ class Alert:
 
         metas = {}
         for exp in expressions:
+            expkey = exp[0] + "/" + exp[1]
             resp = requests.get(self.IODA_ENTITY_API + "?entityType=" + exp[0] + "&entityCode=" + exp[1])
             try:
                 res = resp.json()
@@ -82,7 +83,7 @@ class Alert:
                 continue
 
             try:
-                metas[exp] = {
+                metas[expkey] = {
                     "meta_type": res["data"][0]["type"],
                     "fqid": res["data"][0]["attrs"]["fqid"],
                     "meta_code": res["data"][0]["code"]
