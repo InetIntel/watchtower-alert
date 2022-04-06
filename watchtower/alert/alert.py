@@ -105,7 +105,7 @@ class Alert:
         metas = {}
         for exp in expressions:
             expkey = exp[0] + "/" + exp[1]
-            resp = requests.get(self.IODA_ENTITY_API + "?entityType=" + exp[0] + "&entityCode=" + exp[1])
+            resp = requests.get(self.IODA_ENTITY_API + "/query?entityType=" + exp[0] + "&entityCode=" + exp[1])
             try:
                 res = resp.json()
             except Exception as e:
