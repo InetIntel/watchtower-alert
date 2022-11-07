@@ -5,3 +5,4 @@ requests
 pytimeseries
 slackclient
 aiohttp<4.0.0
+multidict
