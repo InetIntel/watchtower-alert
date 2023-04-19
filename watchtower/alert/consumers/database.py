@@ -87,6 +87,7 @@ class DatabaseConsumer(AbstractConsumer):
         if 'sqlite' in engine_options[0] and engine_options[3]:
             engine_options[3] = '/' + engine_options[3] # host
 
+        engine_options['query'] = {}
         self.url = str(sqlalchemy.engine.url.URL(*engine_options))
 
         # Its a little unsafe to log this since it may have a password:
