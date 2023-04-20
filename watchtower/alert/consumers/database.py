@@ -81,14 +81,22 @@ class DatabaseConsumer(AbstractConsumer):
                                         'message')
         )
 
-        engine_options = [self.config[n] for n in (
-            'drivername', 'username', 'password', 'host', 'port',
-            'databasename')]
-        if 'sqlite' in engine_options[0] and engine_options[3]:
-            engine_options[3] = '/' + engine_options[3] # host
+        if 'sqlite' in self.config['drivername'] and \
+                self.config['host'] is not None:
+            host="/" + self.config['host']
+        else:
+            host=self.config['host']
 
-        engine_options['query'] = {}
-        self.url = str(sqlalchemy.engine.url.URL(*engine_options))
+        url_obj = sqlalchemy.engine.URL.create(
+            drivername=self.config['drivername'],
+            username=self.config['username'],
+            password=self.config['password'],
+            host=host,
+            port=self.config['port'],
+            database=self.config['databasename'],
+            query={})
+
+        self.url = str(url_obj)
 
         # Its a little unsafe to log this since it may have a password:
         # logging.debug('Database engine url: %s', self.url)
