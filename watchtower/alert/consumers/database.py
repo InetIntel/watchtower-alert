@@ -138,8 +138,9 @@ class DatabaseConsumer(AbstractConsumer):
 
             # dirty hax below. should do a select first
             try:
-                ins = self.t_alert.insert().values(vdicts)
-                res = conn.execute(ins)
+                with conn.begin():
+                    ins = self.t_alert.insert().values(vdicts)
+                    res = conn.execute(ins)
             except sqlalchemy.exc.IntegrityError as e:
                 logging.warn("Alert insert failed (maybe it already exists?)")
                 logging.debug(e)
