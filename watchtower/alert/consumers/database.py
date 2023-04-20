@@ -87,7 +87,7 @@ class DatabaseConsumer(AbstractConsumer):
         else:
             host=self.config['host']
 
-        url_obj = sqlalchemy.engine.URL.create(
+        self.url = sqlalchemy.engine.URL.create(
             drivername=self.config['drivername'],
             username=self.config['username'],
             password=self.config['password'],
@@ -96,10 +96,8 @@ class DatabaseConsumer(AbstractConsumer):
             database=self.config['databasename'],
             query={})
 
-        self.url = str(url_obj)
-
         # Its a little unsafe to log this since it may have a password:
-        # logging.debug('Database engine url: %s', self.url)
+        # logging.debug('Database engine url: %s', str(self.url))
 
         self.engine = sqlalchemy.create_engine(self.url,
                                                **self.config['engine_params'])
