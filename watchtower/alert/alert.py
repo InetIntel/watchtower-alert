@@ -46,7 +46,7 @@ logging.getLogger("requests").setLevel(logging.WARNING)
 class Alert:
 
     LEVELS = ['critical', 'warning', 'normal', 'error']
-    IODA_ENTITY_API = "http://api.ioda.inetintel.cc.gatech.edu/v2/entities"
+    IODA_ENTITY_API = "https://api.ioda.inetintel.cc.gatech.edu/v2/entities"
 
     def __init__(self, fqid, name, level, time, expression, history_expression,
                  method, violations=None):
