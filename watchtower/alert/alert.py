@@ -95,6 +95,8 @@ class Alert:
                 if len(vsplit) >= 2:
                     enttype = vsplit[0]
                     entcode = vsplit[1]
+                    if enttype in ["geoasn_country", "geoasn_region"]:
+                        enttype = "geoasn"
                     expressions.add((enttype, entcode))
 
         if not len(expressions):
