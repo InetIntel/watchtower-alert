@@ -107,6 +107,8 @@ class Alert:
         metas = {}
         for exp in expressions:
             expkey = exp[0] + "/" + exp[1]
+            if exp[0].startswith("geoasn_"):
+                exp[0] = "geoasn"
             resp = requests.get(self.IODA_ENTITY_API + "/query?entityType=" + exp[0] + "&entityCode=" + exp[1])
             try:
                 res = resp.json()
@@ -114,7 +116,8 @@ class Alert:
                 logging.error('IODA entity annotation %s failed with JSON decode error: %s' % (exp, e.msg))
                 continue
 
-            if not res or 'data' not in res or not res['data']:
+            if not res or 'data' not in res or not res['data'] or \
+                    len(res['data']) == 0:
                 logging.error('IODA entity annotation %s failed with error: %s' %
                                (exp, res['error'] if res else None))
                 continue
