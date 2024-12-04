@@ -97,6 +97,7 @@ class Alert:
                     entcode = vsplit[1]
                     if enttype in ["geoasn_country", "geoasn_region"]:
                         enttype = "geoasn"
+                        v.expression = enttype + "/" + entcode
                     expressions.add((enttype, entcode))
 
         if not len(expressions):
@@ -107,8 +108,6 @@ class Alert:
         metas = {}
         for exp in expressions:
             expkey = exp[0] + "/" + exp[1]
-            if exp[0].startswith("geoasn_"):
-                exp[0] = "geoasn"
             resp = requests.get(self.IODA_ENTITY_API + "/query?entityType=" + exp[0] + "&entityCode=" + exp[1])
             try:
                 res = resp.json()
