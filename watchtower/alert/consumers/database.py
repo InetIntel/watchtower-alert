@@ -81,20 +81,23 @@ class DatabaseConsumer(AbstractConsumer):
                                         'message')
         )
 
-        if 'sqlite' in self.config['drivername'] and \
-                self.config['host'] is not None:
-            host="/" + self.config['host']
+        port = self.config['port']
+        if isinstance(self.config['host'], (list, tuple)):
+            hosts = [f"{h}:{port}" for h in self.config['host']]
         else:
-            host=self.config['host']
+            hosts = [f"{self.config['host']}:{port}"]
+
+        queryparams = { "host": hosts, "connect_timeout": "3",
+                       "target_session_attrs": "read-write" }
 
         self.url = sqlalchemy.engine.URL.create(
             drivername=self.config['drivername'],
             username=self.config['username'],
             password=self.config['password'],
-            host=host,
-            port=self.config['port'],
+            host="",        # handled via queryparams
+            port=None,
             database=self.config['databasename'],
-            query={})
+            query=queryparams)
 
         # Its a little unsafe to log this since it may have a password:
         # logging.debug('Database engine url: %s', str(self.url))
